@@ -1,6 +1,15 @@
-import { setToken } from '../utils/token';
+import { setToken } from './token';
 
 export const BASE_URL = 'https://auth.nomoreparties.co';
+
+const response = (res) => {
+  if (res.ok) {
+      return res.json();
+  }
+  if(res.status > 299) {
+    return Promise.reject(res);
+  }
+};
 
 export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {
@@ -11,20 +20,7 @@ export const register = (email, password) => {
     },
     body: JSON.stringify({email, password})
   })
-  .then((response) => {
-    try {
-      if (response.status === 201){
-        return response.json();
-      }
-    } catch(error){
-      console.log(error)
-      return (error)
-    }
-  })
-  .then((res) => {
-    return res;
-  })
-  .catch((error) => console.log(error));
+  .then(response);
 };
 
 export const authorize = (email, password) => {
@@ -36,25 +32,7 @@ export const authorize = (email, password) => {
     },
     body: JSON.stringify({email, password})
   })
-  .then((response) => {
-    try {
-      if (response.status === 200){
-        return response.json();
-      }
-    } catch(error){
-      console.log(error)
-      return (error)
-    }
-  })
-  .then((data) => {
-    if(data) {
-      setToken(data.token);
-      return data;
-    } else {
-      return;
-    }
-  })
-  .catch(err => console.log(err))
+  .then(response);
 };
 
 export const checkToken = (token) => {
@@ -66,6 +44,5 @@ export const checkToken = (token) => {
       'Authorization': `Bearer ${token}`,
     }
   })
-  .then(res => res.json())
-  .then(data => data)
+  .then(response);
 }

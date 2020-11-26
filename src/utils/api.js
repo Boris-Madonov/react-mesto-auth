@@ -63,7 +63,7 @@ class Api {
     likeCard(id) {
         return fetch(`${this._baseUrl}/cards/likes/${id}`, {
             method: 'PUT',
-            headers: this._headers 
+            headers: this._headers
         })
         .then(this._response)
     }
@@ -71,7 +71,7 @@ class Api {
     deleteLikeCard(id) {
         return fetch(`${this._baseUrl}/cards/likes/${id}`, {
             method: 'DELETE',
-            headers: this._headers 
+            headers: this._headers
         })
         .then(this._response)
     }
@@ -79,7 +79,7 @@ class Api {
     deleteCard(id) {
         return fetch(`${this._baseUrl}/cards/${id}`, {
             method: 'DELETE',
-            headers: this._headers 
+            headers: this._headers
         })
         .then(this._response)
     }

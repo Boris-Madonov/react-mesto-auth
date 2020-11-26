@@ -15,7 +15,7 @@ import api from '../utils/api';
 import ProtectedRoute from './ProtectedRoute';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import { setToken, getToken, removeToken } from '../utils/token';
-import * as auth from './Auth';
+import * as auth from '../utils/auth';
 
 function App() {
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
@@ -55,16 +55,18 @@ function App() {
 
     auth.checkToken(jwt)
     .then((res) => {
-      if(res) {
-        setLoggedIn(true);
-        history.push('/');
-        setUserEmail(res.data.email)
-      }
+      setLoggedIn(true);
+      history.push('/');
+      setUserEmail(res.data.email)
     })
     .catch((err) => {
-      console.log(err);
       setLoggedIn(false);
-    })
+      if(err.status === 401) {
+        console.log(`Ошибка с кодом ${err.status} - Переданный токен некорректен`);
+      } else {
+        console.log(err);
+      }
+    });
   }
 
   useEffect(() => {
@@ -74,16 +76,20 @@ function App() {
   const handleLogin = (userEmail, userPassword) => {
     auth.authorize(userEmail, userPassword)
     .then((data) => {
-      if (!data){
-        console.log('Что-то пошло не так!');
-      } else {
-        setToken(data.token)
-        setLoggedIn(true);
-        setUserEmail(userEmail);
-        history.push('/');
-      }
+      setToken(data.token)
+      setLoggedIn(true);
+      setUserEmail(userEmail);
+      history.push('/');
     })
-    .catch(err => console.log(err));
+    .catch((err) => {
+      if(err.status === 400) {
+        console.log(`Ошибка с кодом ${err.status} - не передано одно из полей`);
+      } else if(err.status === 401) {
+        console.log(`Ошибка с кодом ${err.status} - пользователь с email не найден`);
+      } else {
+        console.log(err);
+      }
+    });
   };
 
   const handleLogOut = () => {
@@ -93,17 +99,20 @@ function App() {
 
   const handleRegister = (userEmail, userPassword) => {
     auth.register(userEmail, userPassword)
-    .then((res) => {
-      if(res === undefined) {
-        setSuccess(false);
-        setInfoToolTipOpen(true);
-      } else if(res.status !== 400) {
+      .then(() => {
         history.push('/signin');
         setSuccess(true);
         setInfoToolTipOpen(true);
-      }
-    })
-    .catch((error) => console.log(error));
+      })
+      .catch((err) => {
+        setSuccess(false);
+        setInfoToolTipOpen(true);
+        if(err.status === 400) {
+          console.log(`Ошибка с кодом ${err.status} - не корректно заполнено одно из полей`);
+        } else {
+          console.log(err);
+        }
+      });
   };
 
   const handleEditAvatarClick = () => {
@@ -226,7 +235,6 @@ function App() {
             <Switch>
 
               <ProtectedRoute exact path="/" loggedIn={loggedIn}>
-
                 <Header
                   userEmail={userEmail}
                   loggedIn={loggedIn}
@@ -234,7 +242,6 @@ function App() {
                   linkTo="/signin"
                   linkName="Выйти"
                 />
-
                 <Main
                   onEditAvatar={handleEditAvatarClick}
                   onEditProfile={handleEditProfileClick}
@@ -244,7 +251,6 @@ function App() {
                   onDeleteCardClick={handleDeleteCardClick}
                   cards={cards}
                 />
-
                 <EditAvatarPopup
                   isOpen={isEditAvatarPopupOpen}
                   onClose={closeAllPopups}
@@ -265,7 +271,6 @@ function App() {
                   onAddPlace={handleAddPlaceSubmit}
                   isLoading={isLoading}
                 />
-
                 <DeleteCardPopup
                   card={cardDelete}
                   isOpen={isDeleteCardPopupOpen}
@@ -273,40 +278,14 @@ function App() {
                   onCardDelete={handleCardDelete}
                   isLoading={isLoading}
                 />
-
                 <ImagePopup
                   card={selectedCard}
                   onClose={closeAllPopups}
                 />
-
                 <Footer />
-
               </ProtectedRoute>
 
-              <Route path="/signup">
-
-              < Header
-                  userEmail=''
-                  loggedIn={loggedIn}
-                  onSignOut={handleLogOut}
-                  linkTo="/signin"
-                  linkName="Войти"
-                />
-
-                <Register
-                  onRegister={handleRegister}
-                />
-
-                <InfoToolTip
-                  isOpen={isInfoToolTipOpen}
-                  onClose={closeAllPopups}
-                  isSuccess={isSuccess}
-                />
-
-              </Route>
-
               <Route path="/signin">
-
                 <Header
                   userEmail=''
                   loggedIn={loggedIn}
@@ -314,11 +293,27 @@ function App() {
                   linkTo="/signup"
                   linkName="Регистрация"
                 />
-
                 <Login
                   onLogin={handleLogin}
                 />
+              </Route>
 
+              <Route path="/signup">
+                < Header
+                  userEmail=''
+                  loggedIn={loggedIn}
+                  onSignOut={handleLogOut}
+                  linkTo="/signin"
+                  linkName="Войти"
+                />
+                <Register
+                  onRegister={handleRegister}
+                />
+                <InfoToolTip
+                  isOpen={isInfoToolTipOpen}
+                  onClose={closeAllPopups}
+                  isSuccess={isSuccess}
+                />
               </Route>
 
             </Switch>
