@@ -226,10 +226,16 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <>
-          <BrowserRouter>
-
             <Route>
               {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+            </Route>
+
+            <Route>
+              <InfoToolTip
+                isOpen={isInfoToolTipOpen}
+                onClose={closeAllPopups}
+                isSuccess={isSuccess}
+              />
             </Route>
 
             <Switch>
@@ -309,17 +315,9 @@ function App() {
                 <Register
                   onRegister={handleRegister}
                 />
-                <InfoToolTip
-                  isOpen={isInfoToolTipOpen}
-                  onClose={closeAllPopups}
-                  isSuccess={isSuccess}
-                />
               </Route>
 
             </Switch>
-
-          </BrowserRouter>
-
         </>
       </div>
     </CurrentUserContext.Provider>
