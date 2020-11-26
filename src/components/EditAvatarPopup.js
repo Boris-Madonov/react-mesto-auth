@@ -1,55 +1,56 @@
 import React from 'react';
 import PopupWithForm from './PopupWithForm';
+import FormInput from './FormInput';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar, isLoading }) {
-    const user = React.useContext(CurrentUserContext);
-    const [avatar, setAvatar] = React.useState('')
-    const linkRef = React.useRef();
+  const user = React.useContext(CurrentUserContext);
+  const [avatar, setAvatar] = React.useState('')
 
-    React.useEffect(() => {
-        setAvatar(user.avatar);
-    }, [user]);
+  React.useEffect(() => {
+    setAvatar(user.avatar);
+  }, [user]);
 
-    const submitButtonText = isLoading ? 'Сохранение...' : 'Сохранить';
+  const handleChangeAvatar = (e) => {
+    setAvatar(e.target.value);
+  };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+  const submitButtonText = isLoading ? 'Сохранение...' : 'Сохранить';
 
-        const newAvatarLink = linkRef.current.value;
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdateAvatar({
+      link: avatar,
+    });
+  };
 
-        onUpdateAvatar({
-            link: newAvatarLink
-        });
-    };
-
-    return(
-        <PopupWithForm 
-            name="update-avatar"
-            title="Обновить аватар"
-            submit={submitButtonText}
-            isOpen={isOpen}
-            onClose={onClose}
-            onSubmit={handleSubmit}
-        >
-            <label className="popup__form-field">
-                <input
-                    className="popup__entry-field popup__entry-field_avatar-image-url"
-                    id="entry-field-avatar-image-url"
-                    type="url"
-                    name="link"
-                    defaultValue={avatar}
-                    ref={linkRef}
-                    placeholder="Ссылка на картинку"
-                    required
-                />
-                <span
-                    className="popup__entry-field-error"
-                    id="entry-field-avatar-image-url-error">
-                </span>
-            </label>
-        </PopupWithForm>
-    );
+  return(
+    <PopupWithForm
+      name="update-avatar"
+      title="Обновить аватар"
+      submit={submitButtonText}
+      isOpen={isOpen}
+      onClose={onClose}
+      onSubmit={handleSubmit}
+      formName="form__name_place_popup"
+      formFieldset="form__fieldset_place_popup"
+      submitButton="form__submit-button_place_popup"
+    >
+      <FormInput
+        formFieldName="form__field_place_popup"
+        entryFieldName="form__entry-field_place_popup"
+        inputId="popup__entry-field_avatar-image-url"
+        type="url"
+        name="link"
+        placeholder="Укажите ссылку на аватар"
+        value={avatar || ''}
+        onChange={handleChangeAvatar}
+        minLength=''
+        maxLength=''
+      >
+      </FormInput>
+    </PopupWithForm>
+  );
 }
 
 export default EditAvatarPopup
