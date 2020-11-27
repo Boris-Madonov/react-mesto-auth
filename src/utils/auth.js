@@ -1,14 +1,10 @@
-import { setToken } from './token';
-
 export const BASE_URL = 'https://auth.nomoreparties.co';
 
 const response = (res) => {
   if (res.ok) {
       return res.json();
   }
-  if(res.status > 299) {
-    return Promise.reject(res);
-  }
+  return Promise.reject(res);
 };
 
 export const register = (email, password) => {

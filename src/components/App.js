@@ -82,6 +82,8 @@ function App() {
       history.push('/');
     })
     .catch((err) => {
+      setSuccess(false);
+      setInfoToolTipOpen(true);
       if(err.status === 400) {
         console.log(`Ошибка с кодом ${err.status} - не передано одно из полей`);
       } else if(err.status === 401) {
