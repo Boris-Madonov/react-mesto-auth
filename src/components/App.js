@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Route, Switch, BrowserRouter, useHistory, Redirect} from 'react-router-dom';
+import { Route, Switch, useHistory, Redirect} from 'react-router-dom';
 import Header from './Header';
 import Register from './Register';
 import Login from './Login';
@@ -37,14 +37,14 @@ function App() {
 
   useEffect(() => {
     Promise.all([api.getUserInfo(), api.getInitialCards()])
-      .then(([user, cards]) => {
-        setCurrentUser(user);
-        setCards(cards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    .then(([user, cards]) => {
+      setCurrentUser(user);
+      setCards(cards);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }, [loggedIn]);
 
   const tokenCheck = () => {
     const jwt = getToken('jwt');
@@ -57,15 +57,14 @@ function App() {
     .then((res) => {
       setLoggedIn(true);
       history.push('/');
-      setUserEmail(res.data.email)
+      setUserEmail(res.email)
     })
     .catch((err) => {
       setLoggedIn(false);
       if(err.status === 401) {
         console.log(`Ошибка с кодом ${err.status} - Переданный токен некорректен`);
-      } else {
-        console.log(err);
       }
+      console.log(err);
     });
   }
 
