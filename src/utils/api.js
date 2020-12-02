@@ -16,7 +16,7 @@ class Api {
     _getHeaders() {
       const token = getToken('jwt');
       return {
-        ...this.headers,
+        ...this._headers,
         'Authorization': `Bearer ${token}`,
       }
     }
@@ -59,8 +59,6 @@ class Api {
     }
 
     sendCard(data) {
-      console.log(data)
-      console.log(typeof(data))
         return fetch(`${this._baseUrl}/cards`, {
             method: 'POST',
             headers: this._getHeaders(),
@@ -98,7 +96,7 @@ class Api {
 }
 
 const api = new Api({
-    baseUrl: 'http://localhost:4000',
+    baseUrl: 'http://localhost:3000',
     headers: {
         'Content-Type': 'application/json',
     }
